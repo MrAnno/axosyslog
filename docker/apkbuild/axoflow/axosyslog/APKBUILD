@@ -25,6 +25,7 @@ makedepends="
 	hiredis-dev
 	json-c-dev
 	libbpf-dev
+	libcap-dev
 	libdbi-dev
 	libmaxminddb-dev
 	libnet-dev
@@ -97,7 +98,7 @@ build() {
 		\
 		--enable-all-modules \
 		--enable-ebpf \
-		--disable-linux-caps \
+		--enable-linux-caps \
 		--disable-smtp \
 		--disable-systemd \
 		--disable-java \

@@ -27,6 +27,7 @@
 
 #include "filterx-object.h"
 #include "cfg-lexer.h"
+#include "filterx-ref.h"
 
 struct _FilterXExpr
 {
@@ -102,6 +103,8 @@ filterx_expr_eval_typed(FilterXExpr *self)
     }
 
   filterx_object_unref(result);
+
+  unmarshalled = filterx_ref_new(unmarshalled);
   if (self->_update_repr)
     self->_update_repr(self, unmarshalled);
 

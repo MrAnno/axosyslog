@@ -170,6 +170,7 @@ _add_elem_to_json_object(FilterXObject *key_obj, FilterXObject *value_obj, gpoin
   if (!filterx_object_map_to_json(value_obj, &value, &assoc_object))
     return FALSE;
 
+  assoc_object = filterx_ref_new(assoc_object);
   filterx_json_associate_cached_object(object, assoc_object);
   filterx_object_unref(assoc_object);
 

@@ -107,11 +107,11 @@ filterx_json_convert_json_to_object(FilterXObject *root_obj, FilterXWeakRef *roo
     case json_type_string:
       return filterx_string_new(json_object_get_string(jso), json_object_get_string_len(jso));
     case json_type_array:
-      return filterx_json_array_new_sub(json_object_get(jso),
-                                        filterx_weakref_get(root_container) ? : filterx_object_ref(root_obj));
+      return filterx_ref_new(filterx_json_array_new_sub(json_object_get(jso),
+                                        filterx_weakref_get(root_container) ? : filterx_object_ref(root_obj)));
     case json_type_object:
-      return filterx_json_object_new_sub(json_object_get(jso),
-                                         filterx_weakref_get(root_container) ? : filterx_object_ref(root_obj));
+      return filterx_ref_new(filterx_json_object_new_sub(json_object_get(jso),
+                                         filterx_weakref_get(root_container) ? : filterx_object_ref(root_obj)));
     default:
       g_assert_not_reached();
     }
@@ -132,6 +132,7 @@ filterx_json_convert_json_to_object_cached(FilterXObject *self, FilterXWeakRef *
     return filterx_object_ref(filterx_obj);
 
   filterx_obj = filterx_json_convert_json_to_object(self, root_container, jso);
+  filterx_obj = filterx_ref_new(filterx_obj);
   filterx_json_associate_cached_object(jso, filterx_obj);
   return filterx_obj;
 }

@@ -267,6 +267,7 @@ _map_to_json(FilterXObject *s, struct json_object **object, FilterXObject **asso
           goto error;
         }
 
+      elem_assoc_object = filterx_ref_new(elem_assoc_object);
       filterx_json_associate_cached_object(*object, elem_assoc_object);
 
       filterx_object_unref(elem_assoc_object);

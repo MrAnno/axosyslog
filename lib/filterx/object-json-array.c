@@ -158,6 +158,7 @@ _append(FilterXList *s, FilterXObject **new_value)
   if (!filterx_object_map_to_json(*new_value, &jso, &assoc_object))
     return FALSE;
 
+  assoc_object = filterx_ref_new(assoc_object);
   filterx_json_associate_cached_object(jso, assoc_object);
 
   if (json_object_array_add(self->jso, jso) != 0)
@@ -194,6 +195,7 @@ _set_subscript(FilterXList *s, guint64 index, FilterXObject **new_value)
   if (!filterx_object_map_to_json(*new_value, &jso, &assoc_object))
     return FALSE;
 
+  assoc_object = filterx_ref_new(assoc_object);
   filterx_json_associate_cached_object(jso, assoc_object);
 
   if (json_object_array_put_idx(self->jso, index, jso) != 0)

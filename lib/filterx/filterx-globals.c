@@ -90,7 +90,7 @@ _simple_init(void)
 {
   filterx_builtin_simple_functions_init_private(&filterx_builtin_simple_functions);
   g_assert(filterx_builtin_simple_function_register("dict", filterx_dict_new_from_args));
-  g_assert(filterx_builtin_simple_function_register("json", filterx_json_new_from_args));
+  g_assert(filterx_builtin_simple_function_register("json", filterx_dict_new_from_args));
   g_assert(filterx_builtin_simple_function_register("json_array", filterx_json_array_new_from_args));
   g_assert(filterx_builtin_simple_function_register("datetime", filterx_typecast_datetime));
   g_assert(filterx_builtin_simple_function_register("isodate", filterx_typecast_datetime_isodate));

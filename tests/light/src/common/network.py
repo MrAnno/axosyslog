@@ -43,8 +43,11 @@ class SingleConnectionStreamServer(ABC):
 
     async def stop(self):
         logger.debug("Shutting down SingleConnectionStreamServer")
-        await self.close_client()
-        await self._stop_server()
+        try:
+            await self.close_client()
+            await self._stop_server()
+        except ConnectionResetError:
+            pass
 
     async def close_client(self):
         """After a client connection is accepted, new connections will be rejected until this method is called"""

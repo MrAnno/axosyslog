@@ -48,7 +48,10 @@ class SingleConnectionStreamServer(ABC):
 
     async def close_client(self):
         """After a client connection is accepted, new connections will be rejected until this method is called"""
-        await self._client.close()
+        try:
+            await self._client.close()
+        except ConnectionResetError:  # remove this after fixing two way shutdown (SSL_shutdown) in AxoSyslog
+            logger.warning("Client closed the connection prematurely")
 
     async def _create_client(self):
         return self.Client()

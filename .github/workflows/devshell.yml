@@ -7,6 +7,32 @@ on:
     - cron: '00 21 * * *'
 
 jobs:
+  valami:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Query previous container image version"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const versionPattern = /^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$/;
+            const package_name = "axosyslog", org = "axoflow";
+            const allPackageVersions = await github.paginate(
+                github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
+                { package_type: "container", package_name, org }
+            );
+
+            const latest = allPackageVersions.find(p =>
+                p.metadata.container?.tags.includes("latest")
+            );
+            const { data: { metadata: { container: { tags } } } } =
+                await github.rest.packages.getPackageVersionForOrganization({
+                    package_type: "container", package_name, org, package_version_id: latest.id
+                });
+
+            previousDockerTag = tags.find(t => versionPattern.test(t));
+            core.exportVariable('previous_docker_tag', previousDockerTag);
+            console.log(`Here it is: ${previousDockerTag}`)
+
   general:
     runs-on: ubuntu-latest
     container:

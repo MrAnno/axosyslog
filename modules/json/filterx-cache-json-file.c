@@ -203,7 +203,10 @@ _deep_freeze(FilterXFuntionCacheJsonFile *self, FilterXObject *object)
     return;
 
   if (filterx_object_freeze(object))
-    g_ptr_array_add(self->frozen_objects, object);
+    {
+      g_ptr_array_add(self->frozen_objects, object);
+      filterx_object_make_readonly(object);
+    }
 
   object = filterx_ref_unwrap_ro(object);
   if (filterx_object_is_type(object, &FILTERX_TYPE_NAME(json_object)))

@@ -1,6 +1,6 @@
 #############################################################################
-# Copyright (c) 2023-2024 Axoflow
-# Copyright (c) 2023-2024 László Várady
+# Copyright (c) 2023-2025 Axoflow
+# Copyright (c) 2023-2025 László Várady
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -23,22 +23,18 @@
 
 ARG ALPINE_VERSION=3.22
 
-# json-c is required (as we enable threading mode, which is not enabled by
-# the Alpine package)
-# the rest will just improve perf output (due to -fno-omit-frame-pointer
-# compilation)
+# improve perf output (due to -fno-omit-frame-pointer compilation)
 ARG REBUILD_DEPS="main/musl main/jemalloc main/json-c main/glib community/grpc main/python3"
 
 FROM alpine:$ALPINE_VERSION
 ARG ALPINE_VERSION
 ARG REBUILD_DEPS
 
-RUN apk add --update-cache \
+RUN apk add -U --upgrade --no-cache \
       alpine-conf \
       alpine-sdk \
       sudo \
       git \
-    && apk upgrade -a \
     && adduser -D builder \
     && addgroup builder abuild \
     && echo 'builder ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
@@ -46,31 +42,20 @@ RUN apk add --update-cache \
 USER builder
 WORKDIR /home/builder
 
-
-RUN mkdir packages || true \
-    && USER=builder abuild-keygen -n -a -i \
-    && git clone --depth 1 --branch "$ALPINE_VERSION-stable" git://git.alpinelinux.org/aports
-
-
 ADD --chown=builder:builder apkbuild .
 
-ENV CFLAGS=-fno-omit-frame-pointer
-ENV CXXFLAGS=-fno-omit-frame-pointer
-ENV REBUILD_DEPS=$REBUILD_DEPS
+ENV CFLAGS=-fno-omit-frame-pointer CXXFLAGS=-fno-omit-frame-pointer REBUILD_DEPS=$REBUILD_DEPS
 
-# ENABLE_THREADING needs to be enabled for json-c as we will be crashing
-# otherwise
 RUN \
-    sed -i -e '/\$CMAKE_CROSSOPTS/s,$, -DENABLE_THREADING=ON,' aports/main/json-c/APKBUILD && \
-    echo $REBUILD_DEPS && \
-    for pkg in $REBUILD_DEPS; do \
+    mkdir packages || true \
+    && USER=builder abuild-keygen -n -a -i \
+    && git clone --depth 1 --branch "$ALPINE_VERSION-stable" git://git.alpinelinux.org/aports \
+    && echo $REBUILD_DEPS \
+    && for pkg in $REBUILD_DEPS; do \
 	(cd aports/$pkg && \
         sed -i -e '/^pkgrel/s,[0-9]*$,999,' APKBUILD && \
         abuild -r); \
-    done
-
-RUN \
-    cd axoflow/axosyslog \
+    done \
+    && rm -rf aports \
+    && cd axoflow/axosyslog \
     && abuild deps
-
-CMD ["/bin/sh"]

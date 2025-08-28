@@ -24,6 +24,7 @@
 #ifndef FILTERX_EXPR_H_INCLUDED
 #define FILTERX_EXPR_H_INCLUDED
 
+#include "filterx-jit.h"
 #include "filterx-object.h"
 #include "cfg-lexer.h"
 #include "stats/stats-counter.h"
@@ -33,6 +34,9 @@ struct _FilterXExpr
   StatsCounterItem *eval_count;
   /* evaluate expression */
   FilterXObject *(*eval)(FilterXExpr *self);
+  /* execute JIT-compiled expressions */
+  /* TODO partialJIT: move to LogFilterXPipe once all expressions implement compile() */
+  FilterXObject *(*jit_exec)(FilterXJITExecState *state);
 
   /* not thread-safe */
   guint32 ref_cnt;
@@ -53,6 +57,7 @@ struct _FilterXExpr
   gboolean (*init)(FilterXExpr *self, GlobalConfig *cfg);
   void (*deinit)(FilterXExpr *self, GlobalConfig *cfg);
   FilterXExpr *(*optimize)(FilterXExpr *self);
+  FilterXIRValue (*compile)(FilterXExpr *self, FilterXJIT *jit);
   void (*free_fn)(FilterXExpr *self);
 
   /* type of the expr, is not freed, assumed to be managed by something else
@@ -97,6 +102,10 @@ filterx_expr_eval(FilterXExpr *self)
 #endif
 
   stats_counter_inc(self->eval_count);
+
+  /* TODO partialJIT: remove eval() once all expressions implement compile() */
+  if (self->jit_exec)
+    return self->jit_exec(NULL);
 
   return self->eval(self);
 }
@@ -204,6 +213,20 @@ filterx_expr_deinit(FilterXExpr *self, GlobalConfig *cfg)
     self->deinit(self, cfg);
 
   self->inited = FALSE;
+}
+
+/* TODO partialJIT: remove once all expressions implement compile() */
+static inline gboolean
+filterx_expr_can_compile(FilterXExpr *self)
+{
+  return !!self->compile;
+}
+
+static inline FilterXIRValue
+filterx_expr_compile(FilterXExpr *self, FilterXJIT *jit)
+{
+  g_assert(self && self->compile);
+  return self->compile(self, jit);
 }
 
 typedef struct _FilterXUnaryOp

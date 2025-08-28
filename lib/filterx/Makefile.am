@@ -158,4 +158,9 @@ BUILT_SOURCES += 				\
 EXTRA_DIST += lib/filterx/filterx-grammar.ym \
 	lib/filterx/CMakeLists.txt
 
+bin_PROGRAMS += filterx-jit-compiler
+filterx_jit_compiler_SOURCES = lib/filterx/filterx-jit-compiler.c
+filterx_jit_compiler_LDADD = -L${top_builddir}/lib/.libs -lsyslog-ng @SYSLOGNG_DEPS_LIBS@
+filterx_jit_compiler_DEPENDENCIES = lib/libsyslog-ng.la
+
 include lib/filterx/tests/Makefile.am

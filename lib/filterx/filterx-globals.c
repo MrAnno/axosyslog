@@ -52,6 +52,7 @@
 #include "filterx/expr-regexp.h"
 #include "filterx/expr-unset.h"
 #include "filterx/filterx-eval.h"
+#include "filterx/filterx-jit.h"
 #include "filterx/func-keys.h"
 #include "filterx/json-repr.h"
 
@@ -242,11 +243,13 @@ filterx_global_init(void)
   filterx_null_global_init();
   filterx_datetime_global_init();
   filterx_builtin_functions_init();
+  filterx_jit_global_init();
 }
 
 void
 filterx_global_deinit(void)
 {
+  filterx_jit_global_deinit();
   filterx_builtin_functions_deinit();
   filterx_datetime_global_deinit();
   filterx_null_global_deinit();

@@ -70,8 +70,8 @@ void filterx_jit_free(FilterXJIT *self);
 
 /* IR */
 FilterXIRBuilder filterx_jit_get_ir_builder(FilterXJIT *self);
-void filterx_jit_ir_create_block(FilterXJIT *self, const gchar *block_name);
-void filterx_jit_ir_finish_block(FilterXJIT *self, FilterXIRValue result);
+void filterx_jit_ir_add_new_block(FilterXJIT *self, const gchar *block_name);
+void filterx_jit_ir_finish_current_block(FilterXJIT *self, FilterXIRValue result);
 FilterXIRValue filterx_jit_ir_get_current_block(FilterXJIT *self);
 
 FilterXIRSequence filterx_jit_ir_create_sequence(FilterXJIT *self, const gchar *seq_name, FilterXIRValue block);

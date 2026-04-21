@@ -20,7 +20,7 @@
  *
  */
 
-#include "filterx-jit.h"
+#include "filterx/jit/jit.h"
 
 #if SYSLOG_NG_ENABLE_JIT
 
@@ -138,7 +138,7 @@ _block_function_type(FilterXJIT *self)
 }
 
 void
-filterx_jit_ir_create_block(FilterXJIT *self, const gchar *block_name)
+filterx_jit_ir_add_new_block(FilterXJIT *self, const gchar *block_name)
 {
   g_assert(!self->mod_finalized);
   g_assert(!self->current_ir_block);
@@ -152,7 +152,7 @@ filterx_jit_ir_create_block(FilterXJIT *self, const gchar *block_name)
 }
 
 void
-filterx_jit_ir_finish_block(FilterXJIT *self, FilterXIRValue result)
+filterx_jit_ir_finish_current_block(FilterXJIT *self, FilterXIRValue result)
 {
   g_assert(!self->mod_finalized);
   g_assert(self->current_ir_block);
@@ -351,9 +351,11 @@ void filterx_jit_global_init(void) {}
 void filterx_jit_global_deinit(void) {}
 
 FilterXIRBuilder filterx_jit_get_ir_builder(FilterXJIT *self) { g_assert_not_reached(); }
-void filterx_jit_ir_create_block(FilterXJIT *self, const gchar *block_name) { g_assert_not_reached(); }
-void filterx_jit_ir_finish_block(FilterXJIT *self, FilterXIRValue result) {g_assert_not_reached();}
+void filterx_jit_ir_add_new_block(FilterXJIT *self, const gchar *block_name) { g_assert_not_reached(); }
+void filterx_jit_ir_finish_current_block(FilterXJIT *self, FilterXIRValue result) { g_assert_not_reached(); }
+FilterXIRValue filterx_jit_ir_get_current_block(FilterXJIT *self) { g_assert_not_reached(); }
+
 gboolean filterx_jit_finalize(FilterXJIT *self, GError **error) { g_assert_not_reached(); }
-FilterXJITAddress filterx_jit_lookup(FilterXJIT *self, const gchar *block_name, GError **error) {g_assert_not_reached();}
+FilterXJITAddress filterx_jit_lookup(FilterXJIT *self, const gchar *block_name, GError **error) { g_assert_not_reached(); }
 
 #endif

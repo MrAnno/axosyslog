@@ -311,6 +311,9 @@ error:
 void
 filterx_jit_free(FilterXJIT *self)
 {
+  if (!self)
+    return;
+
   if (self->j)
     LLVMOrcDisposeLLJIT(self->j);
   LLVMDisposeBuilder(self->ir);

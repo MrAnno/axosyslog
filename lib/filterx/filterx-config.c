@@ -61,11 +61,11 @@ _finalize_jit(gint type, gpointer user_data)
 #endif
 
 static inline FilterXJIT *
-_create_jit(void)
+_create_jit(FilterXJITDebugInfo debug_info)
 {
 #if SYSLOG_NG_ENABLE_JIT
   GError *error = NULL;
-  FilterXJIT *jit = filterx_jit_new(FILTERX_JIT_MODULE_NAME, &error);
+  FilterXJIT *jit = filterx_jit_new(FILTERX_JIT_MODULE_NAME, debug_info, &error);
 
   if (!jit)
     {
@@ -99,7 +99,7 @@ filterx_config_init(ModuleConfig *s, GlobalConfig *cfg)
     self->enable_jit = TRUE;
 
   if (self->enable_jit)
-    self->jit = _create_jit();
+    self->jit = _create_jit(self->jit_debug_info);
 
   return TRUE;
 }

@@ -92,66 +92,8 @@ _flow_control_window_size_adjust(LogSource *self, guint32 window_size_increment,
 }
 
 static void
-_flow_control_rate_adjust(LogSource *self)
+_flow_control_rate_adjust(LogSource *_)
 {
-#ifdef SYSLOG_NG_HAVE_CLOCK_GETTIME
-  guint32 cur_ack_count, last_ack_count;
-  /* NOTE: this is racy. msg_ack may be executing in different writer
-   * threads. I don't want to lock, all we need is an approximate value of
-   * the ACK rate of the last couple of seconds.  */
-
-  if (accurate_nanosleep && self->threaded)
-    {
-      cur_ack_count = ++self->ack_count;
-      if ((cur_ack_count & 0x3FFF) == 0)
-        {
-          struct timespec now;
-          gint64 diff;
-
-          /* do this every once in a while, once in 16k messages should be fine */
-
-          last_ack_count = self->last_ack_count;
-
-          /* make sure that we have at least 16k messages to measure the rate
-           * for.  Because of the race we may have last_ack_count ==
-           * cur_ack_count if another thread already measured the same span */
-
-          if (last_ack_count < cur_ack_count - 16383)
-            {
-              clock_gettime(CLOCK_MONOTONIC, &now);
-              if (now.tv_sec > self->last_ack_rate_time.tv_sec + 6)
-                {
-                  /* last check was too far apart, this means the rate is quite slow. turn off sleeping. */
-                  self->window_full_sleep_nsec = 0;
-                  self->last_ack_rate_time = now;
-                }
-              else
-                {
-                  /* ok, we seem to have a close enough measurement, this means
-                   * we do have a high rate.  Calculate how much we should sleep
-                   * in case the window gets full */
-
-                  diff = timespec_diff_nsec(&now, &self->last_ack_rate_time);
-                  self->window_full_sleep_nsec = (diff / (cur_ack_count - last_ack_count));
-                  if (self->window_full_sleep_nsec > 1e6)
-                    {
-                      /* in case we'd be waiting for 1msec for another free slot in the window, let's go to background instead */
-                      self->window_full_sleep_nsec = 0;
-                    }
-                  else
-                    {
-                      /* otherwise let's wait for about 8 message to be emptied before going back to the loop, but clamp the maximum time to 0.1msec */
-                      self->window_full_sleep_nsec <<= 3;
-                      if (self->window_full_sleep_nsec > 1e5)
-                        self->window_full_sleep_nsec = 1e5;
-                    }
-                  self->last_ack_count = cur_ack_count;
-                  self->last_ack_rate_time = now;
-                }
-            }
-        }
-    }
-#endif
 }
 
 void
@@ -597,15 +539,6 @@ log_source_queue(LogPipe *s, LogMessage *msg, const LogPathOptions *path_options
   log_pipe_forward_msg(s, msg, path_options);
   _update_processing_latency(self, msg);
 
-  if (accurate_nanosleep && self->threaded && self->window_full_sleep_nsec > 0 && !log_source_free_to_send(self))
-    {
-      struct timespec ts;
-
-      /* wait one 0.1msec in the hope that the buffer clears up */
-      ts.tv_sec = 0;
-      ts.tv_nsec = self->window_full_sleep_nsec;
-      nanosleep(&ts, NULL);
-    }
   msg_diagnostics("<<<<<< Source side message processing finish",
                   log_pipe_location_tag(s),
                   evt_tag_printf("msg", "%p", msg),

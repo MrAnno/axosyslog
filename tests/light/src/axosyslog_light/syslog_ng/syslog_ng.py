@@ -63,12 +63,13 @@ class SyslogNg(object):
         self._syslog_ng_executor = syslog_ng_executor
         self._process: typing.Optional[Popen] = None
 
-    def create_config(self, config_version: str, teardown) -> SyslogNgConfig:
+    def create_config(self, config_version: str, teardown, enable_filterx_jit) -> SyslogNgConfig:
         return SyslogNgConfig(
             config_version,
             LegacyStatsHandler(self._syslog_ng_ctl),
             PrometheusStatsHandler(self._syslog_ng_ctl),
             teardown,
+            enable_filterx_jit,
         )
 
     def start(self, config: SyslogNgConfig) -> Popen:
@@ -152,6 +153,9 @@ class SyslogNg(object):
 
     def get_version(self) -> str:
         return self._get_version_info("Installer-Version:")
+    
+    def get_jit_availability(self) -> str:
+        return self._get_version_info("Enable-Filterx-Jit:")
 
     def is_process_running(self) -> bool:
         return self._process and self._process.poll() is None

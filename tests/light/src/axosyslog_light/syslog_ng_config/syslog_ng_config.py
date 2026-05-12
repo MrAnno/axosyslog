@@ -78,6 +78,7 @@ class SyslogNgConfig(object):
         stats_handler: LegacyStatsHandler,
         prometheus_stats_handler: PrometheusStatsHandler,
         teardown,
+        filterx_jit_enabled : bool,
     ) -> None:
         self._raw_config = None
         self._syslog_ng_config = {
@@ -93,6 +94,7 @@ class SyslogNgConfig(object):
         self._prometheus_stats_handler = prometheus_stats_handler
         self.__implicit_statement_groups: typing.Dict[int, StatementGroup] = {}
         self.teardown = teardown
+        self.filterx_jit_enabled = filterx_jit_enabled
 
     stringify = staticmethod(stringify)
 
@@ -115,6 +117,13 @@ class SyslogNgConfig(object):
             rendered_config = self._raw_config
         else:
             rendered_config = ConfigRenderer(self._syslog_ng_config).get_rendered_config()
+
+        if len(rendered_config) > 0:
+            if self.filterx_jit_enabled:
+                rendered_config += "\noptions { filterx-jit(yes); };\n"
+            else:
+                rendered_config += "\noptions { filterx-jit(no); };\n"
+
         logger.info("Generated syslog-ng config\n{}\n".format(rendered_config))
 
         syslog_ng_config_file = File(config_path)

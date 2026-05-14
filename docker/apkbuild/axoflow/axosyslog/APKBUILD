@@ -73,7 +73,6 @@ build() {
 		--with-llvm-config=/usr/bin/llvm-config-21 \
 		\
 		--enable-all-modules \
-		--enable-ebpf \
 		--enable-jit \
 		--disable-stackdump \
 		--disable-linux-caps \

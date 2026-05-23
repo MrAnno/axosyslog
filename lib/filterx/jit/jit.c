@@ -218,8 +218,19 @@ filterx_jit_ir_add_new_block(FilterXJIT *self, const gchar *block_name)
   _inherit_libfilterx_function_attributes(self, self->current_ir_block);
   g_free(fqn);
 
+  self->current_eval_context = LLVMGetParam(self->current_ir_block, 0);
+  LLVMSetValueName2(self->current_eval_context, "eval_context", strlen("eval_context"));
+
   FilterXIRSequence entry = filterx_jit_ir_add_new_sequence_to_block(self, "entry", self->current_ir_block);
   filterx_jit_ir_set_insert_point_to_sequence_tail(self, entry);
+}
+
+FilterXIRValue
+filterx_jit_ir_get_eval_context(FilterXJIT *self)
+{
+  g_assert(!self->mod_finalized);
+  g_assert(self->current_eval_context);
+  return self->current_eval_context;
 }
 
 void
@@ -236,6 +247,7 @@ filterx_jit_ir_finish_current_block(FilterXJIT *self, FilterXIRValue result)
   _assert_verify_block(self, self->current_ir_block);
 
   self->current_ir_block = NULL;
+  self->current_eval_context = NULL;
   self->current_debug_info_block = NULL;
   LLVMSetCurrentDebugLocation2(self->ir, NULL);
 }
@@ -667,8 +679,9 @@ filterx_jit_global_init(void)
 
   /* For debugging: -time-passes -pass-remarks=inline -pass-remarks-missed=inline -pass-remarks-analysis=inline */
   const gchar *extra_args = g_getenv("SYSLOG_NG_FILTERX_JIT_LLVM_ARGS");
-  gchar *cmdline = g_strconcat("syslog-ng -inlinecold-threshold=512 -inline-cold-callsite-threshold=512 -inlinehint-threshold=512 -mergefunc-use-aliases ",
-                               extra_args, NULL);
+  gchar *cmdline =
+    g_strconcat("syslog-ng -inlinecold-threshold=512 -inline-cold-callsite-threshold=512 -inlinehint-threshold=512 -mergefunc-use-aliases ",
+                extra_args, NULL);
 
   GError *error = NULL;
   gchar **argv = NULL;
@@ -716,6 +729,11 @@ void filterx_jit_ir_finish_current_block(FilterXJIT *self, FilterXIRValue result
   g_assert_not_reached();
 }
 FilterXIRValue filterx_jit_ir_get_current_block(FilterXJIT *self)
+{
+  g_assert_not_reached();
+}
+
+FilterXIRValue filterx_jit_ir_get_eval_context(FilterXJIT *self)
 {
   g_assert_not_reached();
 }

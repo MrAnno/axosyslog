@@ -947,3 +947,101 @@ FILTERX_DEFINE_TYPE(dict, FILTERX_TYPE_NAME(mapping),
                     .freeze = _filterx_dict_freeze,
                     .dedup = _filterx_dict_dedup,
                    );
+
+__attribute__((used))
+gboolean
+fx_jit_dict_aware_set_subscript(FilterXObject *s, FilterXObject *key, FilterXObject **new_value)
+{
+  if (G_UNLIKELY(!filterx_object_is_type_or_ref(s, &FILTERX_TYPE_NAME(dict))))
+    return filterx_object_set_subscript(s, key, new_value);
+
+  if (filterx_object_is_ref(s))
+    {
+      FilterXRef *ref = (FilterXRef *) s;
+      _filterx_ref_cow(ref);
+      gboolean result = _filterx_dict_set_subscript(ref->value, key, new_value);
+      if (result)
+        filterx_ref_set_parent_container(*new_value, s);
+      return result;
+    }
+  return _filterx_dict_set_subscript(s, key, new_value);
+}
+
+__attribute__((used))
+gboolean
+fx_jit_dict_aware_setattr(FilterXObject *s, FilterXObject *attr, FilterXObject **new_value)
+{
+  if (G_UNLIKELY(!filterx_object_is_type_or_ref(s, &FILTERX_TYPE_NAME(dict))))
+    return filterx_object_setattr(s, attr, new_value);
+
+  if (filterx_object_is_ref(s))
+    {
+      FilterXRef *ref = (FilterXRef *) s;
+      _filterx_ref_cow(ref);
+      gboolean result = _filterx_dict_set_subscript(ref->value, attr, new_value);
+      if (result)
+        filterx_ref_set_parent_container(*new_value, s);
+      return result;
+    }
+  return _filterx_dict_set_subscript(s, attr, new_value);
+}
+
+__attribute__((used))
+FilterXObject *
+fx_jit_dict_aware_get_subscript(FilterXObject *s, FilterXObject *key)
+{
+  if (G_UNLIKELY(!filterx_object_is_type_or_ref(s, &FILTERX_TYPE_NAME(dict))))
+    return filterx_object_get_subscript(s, key);
+
+  if (filterx_object_is_ref(s))
+    {
+      FilterXRef *ref = (FilterXRef *) s;
+      FilterXObject *result = _filterx_dict_get_subscript(ref->value, key);
+      return _filterx_ref_replace_shared_xref_with_a_floating_one(result, s);
+    }
+  return _filterx_dict_get_subscript(s, key);
+}
+
+__attribute__((used))
+FilterXObject *
+fx_jit_dict_aware_getattr(FilterXObject *s, FilterXObject *attr)
+{
+  if (G_UNLIKELY(!filterx_object_is_type_or_ref(s, &FILTERX_TYPE_NAME(dict))))
+    return filterx_object_getattr(s, attr);
+
+  if (filterx_object_is_ref(s))
+    {
+      FilterXRef *ref = (FilterXRef *) s;
+      FilterXObject *result = _filterx_dict_get_subscript(ref->value, attr);
+      return _filterx_ref_replace_shared_xref_with_a_floating_one(result, s);
+    }
+  return _filterx_dict_get_subscript(s, attr);
+}
+
+__attribute__((used))
+gboolean
+fx_jit_dict_aware_is_key_set(FilterXObject *s, FilterXObject *key)
+{
+  if (G_UNLIKELY(!filterx_object_is_type_or_ref(s, &FILTERX_TYPE_NAME(dict))))
+    return filterx_object_is_key_set(s, key);
+
+  if (filterx_object_is_ref(s))
+    return _filterx_dict_is_key_set(((FilterXRef *) s)->value, key);
+  return _filterx_dict_is_key_set(s, key);
+}
+
+__attribute__((used))
+gboolean
+fx_jit_dict_aware_unset_key(FilterXObject *s, FilterXObject *key)
+{
+  if (G_UNLIKELY(!filterx_object_is_type_or_ref(s, &FILTERX_TYPE_NAME(dict))))
+    return filterx_object_unset_key(s, key);
+
+  if (filterx_object_is_ref(s))
+    {
+      FilterXRef *ref = (FilterXRef *) s;
+      _filterx_ref_cow(ref);
+      return _filterx_dict_unset_key(ref->value, key);
+    }
+  return _filterx_dict_unset_key(s, key);
+}

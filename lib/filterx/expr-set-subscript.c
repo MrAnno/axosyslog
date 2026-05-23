@@ -21,6 +21,7 @@
  */
 #include "filterx/expr-set-subscript.h"
 #include "filterx/object-primitive.h"
+#include "filterx/object-dict.h"
 #include "filterx/filterx-eval.h"
 #include "filterx/object-null.h"
 #include "filterx/object-message-value.h"
@@ -49,7 +50,7 @@ _set_subscript(FilterXSetSubscript *self, FilterXObject *key, FilterXObject *new
       goto error;
     }
 
-  if (!filterx_object_set_subscript(object, key, &cloned))
+  if (!fx_jit_dict_aware_set_subscript(object, key, &cloned))
     {
       filterx_eval_push_error("Object set-subscript failed", &self->super, key);
       goto error;

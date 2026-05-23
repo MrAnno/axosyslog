@@ -20,6 +20,7 @@
  *
  */
 #include "filterx/expr-get-subscript.h"
+#include "filterx/object-dict.h"
 #include "filterx/filterx-eval.h"
 #include "stats/stats-registry.h"
 #include "stats/stats-cluster-single.h"
@@ -51,7 +52,7 @@ _eval_get_subscript(FilterXExpr *s)
       goto exit;
     }
 
-  result = filterx_object_get_subscript(variable, key);
+  result = fx_jit_dict_aware_get_subscript(variable, key);
   if (!result)
     filterx_eval_push_error("Failed to get-subscript from object", s, key);
 
@@ -80,7 +81,7 @@ _isset(FilterXExpr *s)
       return FALSE;
     }
 
-  gboolean result = filterx_object_is_key_set(variable, key);
+  gboolean result = fx_jit_dict_aware_is_key_set(variable, key);
 
   filterx_object_unref(key);
   filterx_object_unref(variable);
@@ -108,7 +109,7 @@ _unset(FilterXExpr *s)
       goto exit;
     }
 
-  result = filterx_object_unset_key(variable, key);
+  result = fx_jit_dict_aware_unset_key(variable, key);
   if (!result)
     {
       filterx_eval_push_error_static_info("Failed to unset() from object", s, "Object does not support unset()");

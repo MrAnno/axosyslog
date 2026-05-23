@@ -21,6 +21,7 @@
  */
 #include "filterx/expr-getattr.h"
 #include "filterx/object-string.h"
+#include "filterx/object-dict.h"
 #include "filterx/filterx-eval.h"
 #include "stats/stats-registry.h"
 #include "stats/stats-cluster-single.h"
@@ -42,7 +43,7 @@ _do_getattr(FilterXObject *variable, FilterXObject *attr, FilterXExpr *expr)
       return NULL;
     }
 
-  FilterXObject *result = filterx_object_getattr(variable, attr);
+  FilterXObject *result = fx_jit_dict_aware_getattr(variable, attr);
   if (!result)
     filterx_eval_push_error_static_info("Failed to get-attribute from object", expr, "Failed to evaluate key");
 
@@ -71,7 +72,7 @@ _unset(FilterXExpr *s)
       return FALSE;
     }
 
-  result = filterx_object_unset_key(variable, self->attr);
+  result = fx_jit_dict_aware_unset_key(variable, self->attr);
   if (!result)
     {
       filterx_eval_push_error_static_info("Failed to unset() from object", s, "Object does not support unset()");
@@ -115,7 +116,7 @@ _isset(FilterXExpr *s)
       return FALSE;
     }
 
-  gboolean result = filterx_object_is_key_set(variable, self->attr);
+  gboolean result = fx_jit_dict_aware_is_key_set(variable, self->attr);
 
   filterx_object_unref(variable);
   return result;

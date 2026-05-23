@@ -37,4 +37,11 @@ FilterXObject *filterx_dict_new_from_args(FilterXExpr *s, FilterXObject *args[],
 FilterXDictAnchor filterx_dict_get_anchor_for_key(FilterXObject *s, FilterXObject *key);
 void filterx_dict_set_subscript_by_anchor(FilterXObject *s, FilterXDictAnchor anchor, FilterXObject **new_value);
 
+gboolean fx_jit_dict_aware_set_subscript(FilterXObject *s, FilterXObject *key, FilterXObject **new_value);
+gboolean fx_jit_dict_aware_setattr(FilterXObject *s, FilterXObject *attr, FilterXObject **new_value);
+FilterXObject *fx_jit_dict_aware_get_subscript(FilterXObject *s, FilterXObject *key);
+FilterXObject *fx_jit_dict_aware_getattr(FilterXObject *s, FilterXObject *attr);
+gboolean fx_jit_dict_aware_is_key_set(FilterXObject *s, FilterXObject *key);
+gboolean fx_jit_dict_aware_unset_key(FilterXObject *s, FilterXObject *key);
+
 #endif

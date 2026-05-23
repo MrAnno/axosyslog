@@ -22,6 +22,7 @@
 #include "filterx/expr-setattr.h"
 #include "filterx/object-primitive.h"
 #include "filterx/object-string.h"
+#include "filterx/object-dict.h"
 #include "filterx/filterx-eval.h"
 #include "filterx/object-null.h"
 #include "filterx/object-message-value.h"
@@ -58,7 +59,7 @@ _do_setattr(FilterXSetAttr *self, FilterXObject *lhs, FilterXObject *cloned)
       goto error;
     }
 
-  if (!filterx_object_setattr(lhs, self->attr, &cloned))
+  if (!fx_jit_dict_aware_setattr(lhs, self->attr, &cloned))
     {
       filterx_eval_push_error_static_info("Failed to set-attribute to object", &self->super,
                                           "setattr() method failed");

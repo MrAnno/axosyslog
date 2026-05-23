@@ -437,7 +437,7 @@ _filterx_ref_truthy(FilterXObject *s)
  * its proper home: in the parent dict.  This is exactly the
  * "child_of_interest" argument we are passing to clone_container().
  */
-static FilterXObject *
+FilterXObject *
 _filterx_ref_replace_shared_xref_with_a_floating_one(FilterXObject *s, FilterXObject *c)
 {
   if (!s || !filterx_object_is_ref(s))

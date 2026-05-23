@@ -171,5 +171,6 @@ filterx_ref_ground(FilterXObject *s)
 
 FilterXObject *filterx_ref_dup(FilterXObject *s);
 FilterXObject *_filterx_ref_new(FilterXObject *value);
+FilterXObject *_filterx_ref_replace_shared_xref_with_a_floating_one(FilterXObject *s, FilterXObject *c);
 
 #endif

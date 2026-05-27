@@ -72,7 +72,7 @@ _modify_symbols(LLVMContextRef ctx, LLVMModuleRef mod)
       if (g_strcmp0(name, "fx_jit_attribute_template") == 0)
         continue;
 
-      _mark_function_inline(ctx, fn);
+      //_mark_function_inline(ctx, fn);
       _mark_symbol_available_externally(fn);
     }
 

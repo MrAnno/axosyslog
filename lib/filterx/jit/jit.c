@@ -219,7 +219,7 @@ filterx_jit_ir_add_new_block(FilterXJIT *self, const gchar *block_name)
 
   gchar *fqn = _create_fully_qualified_block_name(self, block_name);
   self->current_ir_block = LLVMAddFunction(self->mod, fqn, _block_function_type(self));
-  _set_unwind_attributes(self, self->current_ir_block);
+  //_set_unwind_attributes(self, self->current_ir_block);
   _inherit_libfilterx_function_attributes(self, self->current_ir_block);
   g_free(fqn);
 

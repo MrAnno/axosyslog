@@ -265,6 +265,13 @@ fx_jit_assign_variable_in_scope(FilterXEvalContext *context, FilterXExpr *s, Fil
   return new_value;
 }
 
+__attribute__((used)) __attribute__((noinline))
+FilterXObject *
+fx_jit_eval_variable_typed(FilterXExpr *s)
+{
+  return filterx_expr_make_typed_object(s, _eval_variable(s));
+}
+
 static FilterXIRValue
 _variable_compile(FilterXExpr *s, FilterXJIT *jit)
 {

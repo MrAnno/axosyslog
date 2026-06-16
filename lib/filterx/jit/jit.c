@@ -98,7 +98,7 @@ _optimize_module(gpointer s, LLVMModuleRef mod)
 
   const gchar *pass_override = g_getenv("SYSLOG_NG_FILTERX_JIT_PASSES");
 
-  LLVMTargetMachineRef tm = tm;
+  LLVMTargetMachineRef tm = self->tm;
   const gchar *asd = g_getenv("SYSLOG_NG_FILTERX_JIT_NOTMC");
   if (asd)
     {
@@ -106,7 +106,7 @@ _optimize_module(gpointer s, LLVMModuleRef mod)
       tm = NULL;
     }
 
-  LLVMErrorRef err = LLVMRunPasses(mod, pass_override ? : "default<O3>", self->tm, options);
+  LLVMErrorRef err = LLVMRunPasses(mod, pass_override ? : "default<O3>", tm, options);
 
   LLVMDisposePassBuilderOptions(options);
   return err;

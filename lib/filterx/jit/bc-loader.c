@@ -64,10 +64,20 @@ _mark_function_inline(LLVMContextRef ctx, LLVMValueRef fn)
 }
 
 static void
+_strip_target_attributes(LLVMValueRef fn)
+{
+  static const gchar *attrs[] = { "target-features", "target-cpu", "tune-cpu" };
+  for (gsize i = 0; i < G_N_ELEMENTS(attrs); i++)
+    LLVMRemoveStringAttributeAtIndex(fn, LLVMAttributeFunctionIndex, attrs[i], strlen(attrs[i]));
+}
+
+static void
 _modify_symbols(LLVMContextRef ctx, LLVMModuleRef mod)
 {
   for (LLVMValueRef fn = LLVMGetFirstFunction(mod); fn; fn = LLVMGetNextFunction(fn))
     {
+      _strip_target_attributes(fn);
+
       const gchar *name = LLVMGetValueName(fn);
       if (g_strcmp0(name, "fx_jit_attribute_template") == 0)
         continue;

@@ -271,7 +271,13 @@ filterx_jit_ir_add_new_block(FilterXJIT *self, const gchar *block_name, FilterXS
   gchar *fqn = _create_fully_qualified_block_name(self, block_name);
   self->current_ir_block = LLVMAddFunction(self->mod, fqn, _block_function_type(self));
   _set_unwind_attributes(self, self->current_ir_block);
-  _inherit_libfilterx_function_attributes(self, self->current_ir_block);
+
+  const gchar *env = g_getenv("SYSLOG_NG_FILTERX_JIT_NOINHERIT");
+  if (!env)
+    _inherit_libfilterx_function_attributes(self, self->current_ir_block);
+  else
+    printf("-----------noinherit attr\n");
+
   g_free(fqn);
 
   self->current_eval_context = LLVMGetParam(self->current_ir_block, 0);

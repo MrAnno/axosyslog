@@ -24,7 +24,7 @@
 # must be in sync with axosyslog-builder
 ARG ALPINE_VERSION=3.24
 
-FROM ghcr.io/axoflow/axosyslog-builder:$ALPINE_VERSION AS apkbuilder
+FROM ghcr.io/mranno/axosyslog-builder:$ALPINE_VERSION AS apkbuilder
 
 # NOTE:
 # an alpine system with SDK and dev packages plus a few packages built under
